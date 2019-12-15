@@ -132,12 +132,20 @@ class LexRank:
             default_value = 0
 
         idf_score = defaultdict(lambda: default_value)
+        doc_number_words = defaultdict(lambda: 0)
+        
+        print("Compute doc_number_words .....")
+        for bag in tqdm_notebook(bags_of_words):
+            for word in bag:
+                doc_number_words[word] =doc_number_words[word]+1
 
-        for word in set.union(*bags_of_words):
-            doc_number_word = sum(1 for bag in bags_of_words if word in bag)
-            idf_score[word] = math.log(doc_number_total / doc_number_word)
-
+        print("Compute idf_score .....")        
+        for word in tqdm_notebook(set.union(*bags_of_words)):
+            idf_score[word] = math.log(doc_number_total / doc_number_words[word])
+        
+        del doc_number_words
         return idf_score
+    
 
     def _calculate_similarity_matrix(self, tf_scores):
         length = len(tf_scores)
